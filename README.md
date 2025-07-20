@@ -1,7 +1,8 @@
 # AI-Powered Mock Interview Platform
 
 ## Description
-This is an advanced and interactive AI-powered mock interview platform designed to help job seekers practice and improve their interview skills. Built with Next.js, Tailwind CSS, and Gemini Api,PostgreSQL, Drizzle ORM, it provides users with a good interview experience to enhance their chances of landing their dream job.
+AI-integrated web development project — an interactive platform that simulates mock interviews to help job seekers improve their skills. 
+Built with Next.js, Tailwind CSS, Gemini API, PostgreSQL, Drizzle ORM, it provides users with a good interview experience to enhance their chances of landing their dream job.
 
 ## Features
 - AI-driven Interview: interview questions and feedback powered by AI.
@@ -13,13 +14,15 @@ This is an advanced and interactive AI-powered mock interview platform designed 
 - Recent Interviews: Easily access and review your recent interview sessions directly from the home page.
 
 ## Getting Started
-To get started with the AI-Powered Mock Interview Platform, follow these steps:
+To get started with the Automated AI Mock Interviewer, follow these steps:
 
 1. Clone this repository:
    ```bash
+   git clone https://github.com/modamaan/Ai-mock-Interview.git
 
 2. Navigate to the project directory:
    ```bash
+   cd ai-mock-interview
 
 3. Install dependencies by running: `npm install` or `yarn install`
 
@@ -43,7 +46,7 @@ To use the AI-Powered Mock Interview Platform, follow these guidelines:
 - Review Recent Interviews: Access your most recent interviews directly from the home page for quick review and continued improvement.
 
 ## Feedback
-
+   If you have any feedback, please reach me at [nishantporwal203@gmail.com](mailto:nishantporwal203@gmail.com) or connect with me on [LinkedIn](www.linkedin.com/in/nishant-porwal-581247259).
 
 
 ## Contributing
@@ -56,5 +59,4 @@ Contributions are welcome! If you'd like to contribute to this project, please f
 
 
 ## Support
-
 Show your support by 🌟 the project!!
