@@ -46,7 +46,7 @@ To use the AI-Powered Mock Interview Platform, follow these guidelines:
 - Review Recent Interviews: Access your most recent interviews directly from the home page for quick review and continued improvement.
 
 ## Feedback
-   If you have any feedback, please reach me at [nishantporwal203@gmail.com](mailto:nishantporwal203@gmail.com) or connect with me on [LinkedIn](www.linkedin.com/in/nishant-porwal-581247259).
+   If you have any feedback, please reach me at [nishantporwal203@gmail.com](mailto:nishantporwal203@gmail.com)
 
 
 ## Contributing
