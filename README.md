@@ -18,7 +18,7 @@ To get started with the Automated AI Mock Interviewer, follow these steps:
 
 1. Clone this repository:
    ```bash
-   git clone https://github.com/modamaan/Ai-mock-Interview.git
+   git clone https://github.com/nishant203code/Automated-AI-Mock-Interviewer.git
 
 2. Navigate to the project directory:
    ```bash
