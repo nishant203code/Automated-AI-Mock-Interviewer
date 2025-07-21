@@ -22,7 +22,7 @@ To get started with the Automated AI Mock Interviewer, follow these steps:
 
 2. Navigate to the project directory:
    ```bash
-   cd ai-mock-interview
+   cd Automated-AI-Mock-Interviewer
 
 3. Install dependencies by running: `npm install` or `yarn install`
 
