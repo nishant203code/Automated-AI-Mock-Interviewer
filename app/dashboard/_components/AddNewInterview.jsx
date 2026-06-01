@@ -9,7 +9,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { chatSession } from "@/utils/GeminiAIModal";
+import { createChatSession } from "@/utils/GeminiAIModal";
 import { LoaderCircle } from "lucide-react";
 import { db } from "@/utils/db";
 import { MockInterview } from "@/utils/schema";
@@ -29,12 +29,13 @@ const AddNewInterview = () => {
   const router = useRouter();
 
   const onSubmit = async (e) => {
-    try {
-      setLoading(true);
-      e.preventDefault();
+    e.preventDefault();
+    setLoading(true);
 
+    try {
       if (!jobPosition || !jobDesc || !jobExperience) {
         toast.error("Please fill in all fields");
+        setLoading(false);
         return;
       }
 
@@ -45,27 +46,52 @@ const AddNewInterview = () => {
         Generate 5 relevant interview questions with detailed answers for this position. 
         Format the response as a JSON array where each object has "Question" and "Answer" fields.
         Ensure the questions are appropriate for the experience level and cover key aspects of the job description.
+        IMPORTANT: Return ONLY the JSON array, no additional text or markdown formatting.
       `;
 
-      const result = await chatSession.sendMessage(InputPrompt);
-      let MockJsonResp = result.response.text().trim();
+      // Create a fresh chat session to avoid accumulated history issues
+      const session = createChatSession();
+      const result = await session.sendMessage(InputPrompt);
+      const responseText = result.response.text();
+      let MockJsonResp = responseText.trim();
       
-      // Clean up the JSON response
-      MockJsonResp = MockJsonResp.replace(/```json|```/g, "").trim();
+      // Clean up the JSON response - handle various markdown code block formats
+      MockJsonResp = MockJsonResp.replace(/```json\s*/g, "").replace(/```\s*/g, "").trim();
       
       // Validate JSON
+      let parsedJson;
       try {
-        JSON.parse(MockJsonResp);
-      } catch (error) {
-        console.error("Invalid JSON response:", error);
-        toast.error("Failed to generate interview questions. Please try again.");
+        parsedJson = JSON.parse(MockJsonResp);
+      } catch (parseError) {
+        console.error("Invalid JSON response:", MockJsonResp);
+        console.error("Parse error:", parseError);
+        
+        // Try to extract JSON array from the response
+        const jsonMatch = MockJsonResp.match(/\[[\s\S]*\]/);
+        if (jsonMatch) {
+          try {
+            parsedJson = JSON.parse(jsonMatch[0]);
+            MockJsonResp = jsonMatch[0];
+          } catch (e) {
+            toast.error("Failed to generate interview questions. Please try again.");
+            return;
+          }
+        } else {
+          toast.error("Failed to generate interview questions. Please try again.");
+          return;
+        }
+      }
+
+      // Ensure we have a valid array with Question/Answer fields
+      if (!Array.isArray(parsedJson) || parsedJson.length === 0) {
+        toast.error("Invalid response format. Please try again.");
         return;
       }
 
       const mockId = uuidv4();
       const resp = await db.insert(MockInterview).values({
         mockId,
-        jsonMockResp: MockJsonResp,
+        jsonMockResp: typeof MockJsonResp === 'string' ? MockJsonResp : JSON.stringify(parsedJson),
         jobPosition,
         jobDesc,
         jobExperience,
@@ -78,13 +104,25 @@ const AddNewInterview = () => {
       if (resp && resp[0]?.mockId) {
         toast.success("Interview created successfully!");
         setOpenDialog(false);
+        // Reset form
+        setJobPosition("");
+        setJobDesc("");
+        setJobExperience("");
         router.push("/dashboard/interview/" + resp[0].mockId);
       } else {
-        toast.error("Failed to create interview");
+        toast.error("Failed to save interview to database");
       }
     } catch (error) {
       console.error("Error creating interview:", error);
-      toast.error("An error occurred while creating the interview");
+      if (error?.message?.includes("API key")) {
+        toast.error("Invalid API key. Please check your Gemini API key configuration.");
+      } else if (error?.message?.includes("quota")) {
+        toast.error("API quota exceeded. Please try again later.");
+      } else if (error?.message?.includes("SAFETY")) {
+        toast.error("Content was blocked by safety filters. Please rephrase your job description.");
+      } else {
+        toast.error("An error occurred while creating the interview. Please try again.");
+      }
     } finally {
       setLoading(false);
     }

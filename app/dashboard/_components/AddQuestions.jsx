@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { LoaderCircle } from "lucide-react";
-import { chatSession } from "@/utils/GeminiAIModal";
+import { createChatSession } from "@/utils/GeminiAIModal";
 import { v4 as uuidv4 } from "uuid";
 import { db } from "@/utils/db";
 import { useUser } from "@clerk/nextjs";
@@ -56,21 +56,31 @@ const AddQuestions = () => {
     This company previous question: ${company},
     Based on this information, please provide 5 interview questions with answers in JSON format.
     Each question and answer should be fields in the JSON. Ensure "Question" and "Answer" are fields.
-}  
+    IMPORTANT: Return ONLY the JSON array, no additional text or markdown formatting.
   `;
-    console.log("InputPrompt:", InputPrompt);
 
     try {
-      const result = await chatSession.sendMessage(InputPrompt);
-      const MockQuestionJsonResp = result.response
+      const session = createChatSession();
+      const result = await session.sendMessage(InputPrompt);
+      let MockQuestionJsonResp = result.response
         .text()
-        .replace("```json", "")
-        .replace("```", "")
+        .replace(/```json\s*/g, "")
+        .replace(/```\s*/g, "")
         .trim();
-      // console.log("Parsed data", JSON.parse(MockQuestionJsonResp));
-      
-      console.log("JSON RESPONSE", MockQuestionJsonResp);
-      // console.log("Parsed RESPONSE", JSON.parse(MockQuestionJsonResp))
+
+      // Validate JSON before saving
+      try {
+        JSON.parse(MockQuestionJsonResp);
+      } catch (parseErr) {
+        // Try to extract JSON array from the response
+        const jsonMatch = MockQuestionJsonResp.match(/\[[\s\S]*\]/);
+        if (jsonMatch) {
+          MockQuestionJsonResp = jsonMatch[0];
+          JSON.parse(MockQuestionJsonResp); // validate extracted JSON
+        } else {
+          throw parseErr;
+        }
+      }
 
       if (MockQuestionJsonResp) {
         const resp = await db
@@ -88,19 +98,16 @@ const AddQuestions = () => {
           })
           .returning({ mockId: Question.mockId });
 
-        console.log("Inserted ID:", resp);
-
         if (resp) {
           setOpenDialog(false);
 
           router.push("/dashboard/pyq/" + resp[0]?.mockId);
         }
       } else {
-        console.log("ERROR");
       }
     } catch (error) {
-      console.error("Failed to parse JSON:", error.message);
-      alert("There was an error processing the data. Please try again.");
+      console.error("Failed to process question generation:", error.message);
+      alert("There was an error generating questions. Please try again.");
     } finally {
       setLoading(false);
     }

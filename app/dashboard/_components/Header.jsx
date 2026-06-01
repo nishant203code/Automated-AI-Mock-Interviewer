@@ -28,7 +28,6 @@ const Header = ({ logo }) => {
   const path = usePathname();
 
   useEffect(() => {
-    console.log(path);
   }, []);
   return (
     <div className=" bg-secondary shadow-sm ">

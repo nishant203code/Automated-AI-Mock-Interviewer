@@ -14,7 +14,6 @@ const page = ({ params }) => {
   const [questionData, setQuestionData] = useState();
 
   useEffect(() => {
-    console.log(params.pyqId);
     getQuestionDetails();
   }, []);
 
@@ -25,7 +24,6 @@ const page = ({ params }) => {
       .where(eq(Question.mockId, params.pyqId));
       const questionData = JSON.parse(result[0].MockQuestionJsonResp);
     setQuestionData(questionData);
-    // console.log("data", questionData);
   };
 
 

@@ -28,8 +28,6 @@ const Feedback = ({ params }) => {
       .from(UserAnswer)
       .where(eq(UserAnswer.mockIdRef, params.interviewId))
       .orderBy(UserAnswer.id);
-
-    console.log(result);
     setFeedbackList(result);
   };
 
@@ -39,8 +37,6 @@ const Feedback = ({ params }) => {
         (sum, item) => sum + Number(item.rating),
         0
       );
-      // console.log("total",totalRating);
-      // console.log("length",feedbackList.length);
       return (totalRating / feedbackList.length).toFixed(1);
     }
     return 0;

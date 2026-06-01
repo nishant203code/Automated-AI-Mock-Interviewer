@@ -21,8 +21,6 @@ const QuestionList = () => {
       .from(Question)
       .where(eq(Question.createdBy, user?.primaryEmailAddress?.emailAddress))
       .orderBy(desc(Question.id));
-
-    console.log(result);
     setQuestionList(result);
   };
   return (
